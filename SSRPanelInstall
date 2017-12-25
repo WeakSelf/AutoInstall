@@ -50,11 +50,12 @@ ssrpanelpwd=`openssl rand -base64 10`
 echo $rootpwd
 echo $ssrpanelpwd
 
-echo -e "\n" "y\n" '$rootpwd\n' '$rootpwd\n' 'y\n' 'y\n' 'y\n' 'y\n' | mysql_secure_installation
+echo -e "\n" "y\n" "123456\n" "123456\n" "y\n" "y\n" "y\n" "y\n" | mysql_secure_installation
+mysqladmin -uroot -p123456 password $rootpwd
 mysql -uroot --password=$rootpwd -e "CREATE DATABASE ssrpanel;"
 mysql -uroot --password=$rootpwd -e "GRANT ALL ON ssrpanel.* TO 'ssrpanel' IDENTIFIED BY '$ssrpanelpwd';"
 mysql -uroot --password=$rootpwd -e "FLUSH PRIVILEGES;"
-mysql -uroot --password=$rootpwd ssrpanel < /home/www/ssrpanel/sql/db.sql
+
 systemctl enable mariadb
 touch ~/pwd.txt
 echo "mariadb root pwd : $rootpwd" >> ~/pwd.txt
@@ -68,6 +69,7 @@ sed "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/conf
 sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php
 
 cd /home/www/ssrpanel
+mysql -uroot --password=$rootpwd ssrpanel </home/www/ssrpanel/sql/db.sql
 php composer.phar install
 php artisan key:generate
 chown -R www:www .
