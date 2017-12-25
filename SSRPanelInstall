@@ -14,7 +14,8 @@ wget https://github.com/WeakSelf/AutoInstall/raw/master/php.zip
 wget https://github.com/WeakSelf/AutoInstall/raw/master/php.z01
 zip php.zip -s=0 --out php-7.1.zip
 unzip php-7.1.zip
-cd ~/php-7.1.12 & make install
+cd ~/php-7.1.12
+make install
 export PATH=$PATH:/usr/local/php7/bin
 cp ~/php-7.1.12/sapi/fpm/php-fpm.service /usr/lib/systemd/system/
 chmod 754 /usr/lib/systemd/system/php-fpm.service
@@ -24,7 +25,8 @@ systemctl enable php-fpm
 cd ~
 wget https://github.com/WeakSelf/AutoInstall/raw/master/libmcrypt-2.5.7.zip
 unzip libmcrypt-2.5.7.zip
-cd ~/libmcrypt-2.5.7 & make install
+cd ~/libmcrypt-2.5.7
+make install
 
 cd /usr/local/php7/etc/php-fpm.d/
 wget https://github.com/WeakSelf/AutoInstall/raw/master/www.conf
@@ -68,8 +70,8 @@ systemctl enable mariadb
 touch ~/pwd.txt
 echo "mariadb root pwd : $rootpwd" >> ~/pwd.txt
 echo "mariadb ssrpanel pwd : $ssrpanelpwd" >> ~/pwd.txt
-sed 's/'username' => 'root',/'username' => 'ssrpanel',/' /home/www/ssrpanel/config/database.php
-sed 's/'password' => '',/'password' => '$ssrpanelpwd',/' /home/www/ssrpanel/config/database.php
+sed 's/"'username' => 'root',"/"'username' => 'ssrpanel',"/' /home/www/ssrpanel/config/database.php
+sed 's/\'password\' => \'\',/\'password\' => \'$ssrpanelpwd\',/' /home/www/ssrpanel/config/database.php
 
 #echo '* * * * * php /home/www/ssrpanel/artisan schedule:run >> /dev/null 2>&1' | crontab -e 
 firewall-cmd --zone=public --add-port=80/tcp --permanent
