@@ -43,17 +43,6 @@ systemctl enable nginx
 groupadd www
 useradd -g www www -s /sbin/nologin
 
-
-echo "install ssrpanel"
-cd /home/www
-git clone https://github.com/ssrpanel/ssrpanel.git
-cd /home/www/ssrpanel
-php composer.phar install
-php artisan key:generate
-chown -R www:www .
-chmod -R 777 storage/
-
-
 echo "install mariadb"
 systemctl start mariadb
 rootpwd=`openssl rand -base64 10`
@@ -62,16 +51,27 @@ echo $rootpwd
 echo $ssrpanelpwd
 
 echo -e "\n" "y\n" '$rootpwd\n' '$rootpwd\n' 'y\n' 'y\n' 'y\n' 'y\n' | mysql_secure_installation
-mysql -uroot -p$rootpwd -e "CREATE DATABASE ssrpanel;"
-mysql -uroot -p$rootpwd -e "GRANT ALL ON ssrpanel.* TO 'ssrpanel' IDENTIFIED BY '$ssrpanelpwd';"
-mysql -uroot -p$rootpwd -e "FLUSH PRIVILEGES;"
-mysql -uroot -p$rootpwd ssrpanel < /home/www/ssrpanel/sql/db.sql
+mysql -uroot --password=$rootpwd -e "CREATE DATABASE ssrpanel;"
+mysql -uroot --password=$rootpwd -e "GRANT ALL ON ssrpanel.* TO 'ssrpanel' IDENTIFIED BY '$ssrpanelpwd';"
+mysql -uroot --password=$rootpwd -e "FLUSH PRIVILEGES;"
+mysql -uroot --password=$rootpwd ssrpanel < /home/www/ssrpanel/sql/db.sql
 systemctl enable mariadb
 touch ~/pwd.txt
 echo "mariadb root pwd : $rootpwd" >> ~/pwd.txt
 echo "mariadb ssrpanel pwd : $ssrpanelpwd" >> ~/pwd.txt
-sed 's/"'username' => 'root',"/"'username' => 'ssrpanel',"/' /home/www/ssrpanel/config/database.php
-sed 's/\'password\' => \'\',/\'password\' => \'$ssrpanelpwd\',/' /home/www/ssrpanel/config/database.php
+
+echo "install ssrpanel"
+cd /home/www
+git clone https://github.com/ssrpanel/ssrpanel.git
+
+sed "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/config/database.php
+sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php
+
+cd /home/www/ssrpanel
+php composer.phar install
+php artisan key:generate
+chown -R www:www .
+chmod -R 777 storage/
 
 #echo '* * * * * php /home/www/ssrpanel/artisan schedule:run >> /dev/null 2>&1' | crontab -e 
 firewall-cmd --zone=public --add-port=80/tcp --permanent
