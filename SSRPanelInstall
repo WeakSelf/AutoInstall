@@ -65,8 +65,8 @@ echo "install ssrpanel"
 cd /home/www
 git clone https://github.com/ssrpanel/ssrpanel.git
 
-sed "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/config/database.php
-sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php
+sed "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/config/database.php >/home/www/ssrpanel/config/database.php
+sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php >/home/www/ssrpanel/config/database.php
 
 cd /home/www/ssrpanel
 mysql -uroot --password=$rootpwd ssrpanel </home/www/ssrpanel/sql/db.sql
