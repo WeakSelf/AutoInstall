@@ -10,7 +10,7 @@ yum -y install libxml2 libxml2-devel libmcrypt libXpm-devel libc-client-devel li
 yum -y install libevent-devel libxslt-devel freetype-devel unixODBC-devel aspell-devel readline-devel net-snmp-devel enchant-devel
 yum -y install bzip2 bzip2-devel
 yum -y install gmp-devel readline-devel net-snmp-devel libxslt-devel
-
+#wget https://github.com/WeakSelf/AutoInstall/raw/master/SSRPanelInstall && chmod +x SSRPanelInstall && ./SSRPanelInstall 
 cd ~
 wget https://github.com/WeakSelf/AutoInstall/raw/master/libmcrypt-2.5.7.zip
 unzip libmcrypt-2.5.7.zip
@@ -70,8 +70,8 @@ echo "install ssrpanel"
 cd /home/www
 git clone https://github.com/ssrpanel/ssrpanel.git
 
-sed "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/config/database.php >/home/www/ssrpanel/config/database.php
-sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php >/home/www/ssrpanel/config/database.php
+sed -i "s/'username' => 'root',/'username' => 'ssrpanel',/" /home/www/ssrpanel/config/database.php
+sed -i "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/config/database.php
 
 cd /home/www/ssrpanel
 mysql -uroot --password=$rootpwd ssrpanel </home/www/ssrpanel/sql/db.sql
@@ -80,6 +80,12 @@ echo -e "yes" | php artisan key:generate
 chown -R www:www .
 chmod -R 777 storage/
 
-#echo '* * * * * php /home/www/ssrpanel/artisan schedule:run >> /dev/null 2>&1' | crontab -e 
+echo "Asia/Shanghai" > /etc/sysconfig/clock
+echo -e "\n" | cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+yum install ntp
+echo "ntpdate cn.pool.ntp.org" > /etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
+echo '* * * * * /usr/local/php7/bin/php /home/www/ssrpanel/artisan schedule:run >> /dev/null 2>&1' | crontab -e 
 firewall-cmd --zone=public --add-port=80/tcp --permanent
 echo "Complete!"
+reboot
