@@ -1,4 +1,6 @@
 #!/bin/bash
+wget https://mirrors.ustc.edu.cn/epel//epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
 yum -y install gcc g++ gcc+ gcc-c++
 yum -y install git unzip zip nginx curl gd2 gd net-tools mariadb mariadb-server npm
 yum -y install pcre-devel openssl openssl-devel
@@ -70,7 +72,7 @@ sed "s/'password' => '',/'password' => '$ssrpanelpwd',/" /home/www/ssrpanel/conf
 cd /home/www/ssrpanel
 mysql -uroot --password=$rootpwd ssrpanel </home/www/ssrpanel/sql/db.sql
 php composer.phar install
-php artisan key:generate
+echo -e "yes" | php artisan key:generate
 chown -R www:www .
 chmod -R 777 storage/
 
