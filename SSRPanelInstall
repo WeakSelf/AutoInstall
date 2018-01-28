@@ -1,6 +1,8 @@
 #!/bin/bash
 wget https://mirrors.ustc.edu.cn/epel//epel-release-latest-7.noarch.rpm
 rpm -ivh epel-release-latest-7.noarch.rpm
+yum clean all
+#yum -y update
 yum -y install gcc g++ gcc+ gcc-c++
 yum -y install git unzip zip nginx curl gd2 gd net-tools mariadb mariadb-server npm
 yum -y install pcre-devel openssl openssl-devel
@@ -27,12 +29,13 @@ export PATH=$PATH:/usr/local/php7/bin
 cp ~/php-7.1.12/sapi/fpm/php-fpm.service /usr/lib/systemd/system/
 chmod 754 /usr/lib/systemd/system/php-fpm.service
 cp ~/php-7.1.12/php.ini-production /usr/local/php7/etc/php.ini
+cp /usr/local/php7/etc/php-fpm.conf.default /usr/local/php7/etc/php-fpm.conf
 systemctl enable php-fpm
 
 cd /usr/local/php7/etc/php-fpm.d/
 wget https://github.com/WeakSelf/AutoInstall/raw/master/www.conf
 
-
+systemctl start nginx
 cd /etc/nginx/
 mv nginx.conf nginx.conf.origin
 wget https://github.com/WeakSelf/AutoInstall/raw/master/nginx.conf
@@ -40,6 +43,7 @@ wget https://github.com/WeakSelf/AutoInstall/raw/master/nginx.conf
 cd /etc/nginx/conf.d/
 wget https://github.com/WeakSelf/AutoInstall/raw/master/ssrpanel.conf
 systemctl enable nginx
+nginx -s reload
 
 groupadd www
 useradd -g www www -s /sbin/nologin
